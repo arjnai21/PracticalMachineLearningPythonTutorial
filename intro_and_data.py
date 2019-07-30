@@ -26,8 +26,8 @@ df['label'] = df[forecast_col].shift(-forecast_out)
 
 
 X = np.array(df.drop(['label'], 1))
-X = X[:-forecast_out]
 X = preprocessing.scale(X)
+X = X[:-forecast_out]
 X_lately = X[-forecast_out:]
 df.dropna(inplace=True)
 
@@ -40,4 +40,5 @@ clf = LinearRegression(n_jobs=-1)
 clf.fit(X_train, y_train)
 accuracy = clf.score(X_test, y_test)
 
-print(accuracy)
+ #print(accuracy)
+
