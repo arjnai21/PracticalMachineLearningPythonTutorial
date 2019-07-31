@@ -1,11 +1,16 @@
 import pandas as pd
 import math
 import quandl
+import datetime
 import numpy as np
 from sklearn import preprocessing, model_selection, svm
 from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+from matplotlib import style
 
-df = quandl.get('WIKI/GOOGL')
+style.use('ggplot')
+
+df = quandl.get('WIKI/AAPL')
 
 df = df[['Adj. Open', 'Adj. High', 'Adj. Low', 'Adj. Close', 'Adj. Volume']]
 
@@ -40,5 +45,28 @@ clf = LinearRegression(n_jobs=-1)
 clf.fit(X_train, y_train)
 accuracy = clf.score(X_test, y_test)
 
- #print(accuracy)
+# print(accuracy)
 
+forecast_set = clf.predict(X_lately)
+
+print(forecast_set, accuracy, forecast_out)
+
+df['Forecast'] = np.nan
+last_date = df.iloc[-1].name
+last_unix = last_date.timestamp()
+one_day = 86400
+next_unix = last_unix + one_day
+
+for i in forecast_set:
+    next_date = datetime.datetime.fromtimestamp(next_unix)
+    next_unix += one_day
+    df.loc[next_date] = [np.nan for _ in range(len(df.columns)-1)] + [i]
+
+print(df.tail())
+
+df['Adj. Close'].plot()
+df['Forecast'].plot()
+plt.legend(loc=4)
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.show()
